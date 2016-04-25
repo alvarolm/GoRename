@@ -1,131 +1,131 @@
 [
     {
-        "caption": "GoGuru",
-        "command": "go_guru"
+        "caption": "GoRename",
+        "command": "go_rename"
     },
     {
-        "caption": "GoGuru: Show Results",
+        "caption": "GoRename: Show Results",
         "command": "go_guru_show_results"
     },
     {
-        "caption": "GoGuru: User Settings",
+        "caption": "GoRename: User Settings",
         "command": "open_file",
         "args": {
-            "file": "${packages}/GoGuru/User.sublime-settings"
+            "file": "${packages}/GoRename/User.sublime-settings"
         }
     },
     {
-        "caption": "GoGuru: callees",
+        "caption": "GoRename: callees",
         "command": "go_guru",
         "args": {
             "mode": "callees"
         }
     },
     {
-        "caption": "GoGuru: callers",
+        "caption": "GoRename: callers",
         "command": "go_guru",
         "args": {
             "mode": "callers"
         }
     },
     {
-        "caption": "GoGuru: callstack",
+        "caption": "GoRename: callstack",
         "command": "go_guru",
         "args": {
             "mode": "callstack"
         }
     },
     {
-        "caption": "GoGuru: definition",
+        "caption": "GoRename: definition",
         "command": "go_guru",
         "args": {
             "mode": "definition"
         }
     },
     {
-        "caption": "GoGuru: describe",
+        "caption": "GoRename: describe",
         "command": "go_guru",
         "args": {
             "mode": "describe"
         }
     },
     {
-        "caption": "GoGuru: freevars",
+        "caption": "GoRename: freevars",
         "command": "go_guru",
         "args": {
             "mode": "freevars"
         }
     },
     {
-        "caption": "GoGuru: implements",
+        "caption": "GoRename: implements",
         "command": "go_guru",
         "args": {
             "mode": "implements"
         }
     },
     {
-        "caption": "GoGuru: peers",
+        "caption": "GoRename: peers",
         "command": "go_guru",
         "args": {
             "mode": "peers"
         }
     },
     {
-        "caption": "GoGuru: pointsto",
+        "caption": "GoRename: pointsto",
         "command": "go_guru",
         "args": {
             "mode": "pointsto"
         }
     },
     {
-        "caption": "GoGuru: referrers",
+        "caption": "GoRename: referrers",
         "command": "go_guru",
         "args": {
            "mode": "referrers"
         }
     },
     {
-        "caption": "GoGuru: what",
+        "caption": "GoRename: what",
         "command": "go_guru",
         "args": {
             "mode": "what"
         }
     },
     {
-        "caption": "GoGuru: callgraph",
+        "caption": "GoRename: callgraph",
         "command": "go_guru",
         "args": {
             "mode": "callgraph"
         }
     },
     {
-        "caption": "GoGuru: Default Settings",
+        "caption": "GoRename: Default Settings",
         "command": "open_file",
         "args": {
-            "file": "${packages}/GoGuru/Default.sublime-settings"
+            "file": "${packages}/GoRename/Default.sublime-settings"
         }
     },
     {
-        "caption": "GoGuru: Default Key Bindings",
+        "caption": "GoRename: Default Key Bindings",
         "command": "open_file",
         "args": {
-            "file": "${packages}/GoGuru/Default (Linux).sublime-keymap",
+            "file": "${packages}/GoRename/Default (Linux).sublime-keymap",
         "platform": "Linux"
         }
     },
     {
-        "caption": "GoGuru: Default Key Bindings",
+        "caption": "GoRename: Default Key Bindings",
         "command": "open_file",
         "args": {
-            "file": "${packages}/GoGuru/Default (Windows).sublime-keymap",
+            "file": "${packages}/GoRename/Default (Windows).sublime-keymap",
         "platform": "Windows"
         }
     },
     {
-        "caption": "GoGuru: Default Key Bindings",
+        "caption": "GoRename: Default Key Bindings",
         "command": "open_file",
         "args": {
-            "file": "${packages}/GoGuru/Default (OSX).sublime-keymap",
+            "file": "${packages}/GoRename/Default (OSX).sublime-keymap",
         "platform": "OSX"
         }
     },

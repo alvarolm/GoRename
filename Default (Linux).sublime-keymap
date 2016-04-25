@@ -1,6 +1,6 @@
 [
-    { "keys": ["ctrl+shift+g"], "command": "go_guru"},
-    { "keys": ["ctrl+alt+shift+g"], "command": "go_guru_show_results"}
+    { "keys": ["ctrl+alt+r"], "command": "go_rename"},
+    { "keys": ["ctrl+alt+shift+r"], "command": "go_rename_show_results"}
 ]
 /*
 	You can also set a key binding for a specific mode by adding a "mode" arg, e.g.:
