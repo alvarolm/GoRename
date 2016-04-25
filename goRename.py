@@ -3,9 +3,9 @@
 # This program is Free Software see LICENSE file for details.
 
 """
-GoGuru is a Go guru plugin for Sublime Text 3.
-It depends on the guru tool being installed:
-go get golang.org/x/tools/cmd/guru
+GoRename is a Go gorename plugin for Sublime Text 3.
+It depends on the gorename tool being installed:
+go get golang.org/x/tools/cmd/gorename
 """
 
 import sublime, sublime_plugin, subprocess, time, re, os, subprocess, sys
@@ -17,14 +17,14 @@ use_golangconfig = False
 
 
 def log(*msg):
-    print("GoGuru:", msg[0:])
+    print("GoRename:", msg[0:])
 
 def debug(*msg):
     if DEBUG:
-        print("GoGuru [DEBUG]:", msg[0:])
+        print("GoRename [DEBUG]:", msg[0:])
 
 def error(*msg):
-        print("GoGuru [ERROR]:", msg[0:])
+        print("GoRename [ERROR]:", msg[0:])
 
 def plugin_loaded():
     global DEBUG
@@ -33,7 +33,7 @@ def plugin_loaded():
     global use_golangconfig
 
     DEBUG = get_setting("debug", False)
-    PluginPath = sublime.packages_path()+'/GoGuru/'
+    PluginPath = sublime.packages_path()+'/GoRename/'
     use_golangconfig = get_setting("use_golangconfig", False)
 
     # load shellenv
@@ -80,7 +80,7 @@ def plugin_loaded():
     log("version:", VERSION)
 
 
-class GoGuruCommand(sublime_plugin.TextCommand):
+class GoRenameCommand(sublime_plugin.TextCommand):
     def __init__(self, view):
         self.view = view 
         self.mode = 'None'
@@ -96,10 +96,10 @@ class GoGuruCommand(sublime_plugin.TextCommand):
 
         if mode:
             self.write_running(mode)
-            self.guru(byte_end, begin_offset=byte_begin, mode=mode, callback=self.guru_complete)
+            self.gorename(byte_end, begin_offset=byte_begin, mode=mode, callback=self.gorename_complete)
             return
 
-        # Get the guru mode from the user.
+        # Get the gorename mode from the user.
         modes = ["callees","callers","callstack","definition","describe","freevars","implements","peers","pointsto","referrers","what","callgraph"]
         descriptions  = [
             "callees     show possible targets of selected function call",
@@ -115,16 +115,16 @@ class GoGuruCommand(sublime_plugin.TextCommand):
             "what        show basic information about the selected syntax node",
             "callgraph   show complete callgraph of program"]
 
-        # Call guru cmd with the given mode.
+        # Call gorename cmd with the given mode.
         def on_done(i):
             if i >= 0 :
                 self.write_running(modes[i])
 
-                self.guru(byte_end, begin_offset=byte_begin, mode=modes[i], callback=self.guru_complete)
+                self.gorename(byte_end, begin_offset=byte_begin, mode=modes[i], callback=self.gorename_complete)
 
         self.view.window().show_quick_panel(descriptions, on_done, sublime.MONOSPACE_FONT)
 
-    def guru_complete(self, out, err):
+    def gorename_complete(self, out, err):
         self.write_out(out, err)
 
     def write_running(self, mode):
@@ -137,7 +137,7 @@ class GoGuruCommand(sublime_plugin.TextCommand):
         view = get_output_view(window)
 
         # Run a new command to use the edit object for this view.
-        view.run_command('go_guru_write_running', {'mode': mode})
+        view.run_command('go_gorename_write_running', {'mode': mode})
 
         if get_setting("output", "buffer") == "output_panel":
             window.run_command('show_panel', {'panel': "output." + view.name() })
@@ -145,14 +145,14 @@ class GoGuruCommand(sublime_plugin.TextCommand):
             window.focus_view(view)
 
     def write_out(self, result, err):
-        """ Write the guru output to a new file.
+        """ Write the gorename output to a new file.
         """
 
         window = self.view.window()
         view = get_output_view(window)
 
         # Run a new command to use the edit object for this view.
-        view.run_command('go_guru_write_results', {
+        view.run_command('go_gorename_write_results', {
             'result': result,
             'err': err})
 
@@ -183,8 +183,8 @@ class GoGuruCommand(sublime_plugin.TextCommand):
             byte_offset += len(char.encode('utf-8'))
         return cb_map
 
-    def guru(self, end_offset, begin_offset=None, mode="describe", callback=None):
-        """ Builds the guru shell command and calls it, returning it's output as a string.
+    def gorename(self, end_offset, begin_offset=None, mode="describe", callback=None):
+        """ Builds the gorename shell command and calls it, returning it's output as a string.
         """
 
         pos = "#" + str(end_offset)
@@ -197,21 +197,21 @@ class GoGuruCommand(sublime_plugin.TextCommand):
         cmd_env = ''
         if use_golangconfig:
             try:
-                toolpath, cmd_env = golangconfig.subprocess_info('guru', ['GOPATH', 'PATH'], view=self.view)
+                toolpath, cmd_env = golangconfig.subprocess_info('gorename', ['GOPATH', 'PATH'], view=self.view)
                 toolpath = os.path.realpath(toolpath)
             except:
                 error("golangconfig:", sys.exc_info())
                 return
         else:
-            toolpath = 'guru'
+            toolpath = 'gorename'
             cmd_env = shellenv.get_env(for_subprocess=True)[1]
             cmd_env.update(get_setting("env", {}))
 
         debug("env", cmd_env)
 
-        guru_scope = ",".join(get_setting("guru_scope", ""))
+        gorename_scope = ",".join(get_setting("gorename_scope", ""))
 
-        # add local package to guru scope
+        # add local package to gorename scope
         if get_setting("use_current_package", True) :
             current_file_path = os.path.realpath(os.path.dirname(file_path))
             GOPATH = os.path.realpath(cmd_env["GOPATH"]+"/src")+"/"
@@ -219,24 +219,24 @@ class GoGuruCommand(sublime_plugin.TextCommand):
             debug("current_file_path", current_file_path)
             debug("GOPATH", GOPATH)
             debug("local_package", local_package)
-            guru_scope = guru_scope+','+local_package
-        guru_scope = guru_scope.strip()
-        debug("guru_scope", guru_scope)
-        if len(guru_scope) > 0:
-            guru_scope = "-scope "+guru_scope
+            gorename_scope = gorename_scope+','+local_package
+        gorename_scope = gorename_scope.strip()
+        debug("gorename_scope", gorename_scope)
+        if len(gorename_scope) > 0:
+            gorename_scope = "-scope "+gorename_scope
 
-        guru_json = ""
-        if get_setting("guru_json", False):
-            guru_json = "-json"
+        gorename_json = ""
+        if get_setting("gorename_json", False):
+            gorename_json = "-json"
 
-        # Build guru cmd.
-        cmd = "%(toolpath)s %(scope)s %(guru_json)s %(mode)s %(file_path)s:%(pos)s" % {
+        # Build gorename cmd.
+        cmd = "%(toolpath)s %(scope)s %(gorename_json)s %(mode)s %(file_path)s:%(pos)s" % {
         "toolpath": toolpath,
         "file_path": file_path,
         "pos": pos,
-        "guru_json": guru_json,
+        "gorename_json": gorename_json,
         "mode": mode,
-        "scope": guru_scope} 
+        "scope": gorename_scope} 
         debug("cmd", cmd)
 
         sublime.set_timeout_async(lambda: self.runInThread(cmd, callback, cmd_env), 0)
@@ -247,8 +247,8 @@ class GoGuruCommand(sublime_plugin.TextCommand):
         callback(out.decode('utf-8'), err.decode('utf-8'))
 
 
-class GoGuruWriteResultsCommand(sublime_plugin.TextCommand):
-    """ Writes the guru output to the current view.
+class GoRenameWriteResultsCommand(sublime_plugin.TextCommand):
+    """ Writes the gorename output to the current view.
     """
 
     def run(self, edit, result, err):
@@ -264,20 +264,20 @@ class GoGuruWriteResultsCommand(sublime_plugin.TextCommand):
         view.insert(edit, view.size(), "\n\n\n")
         
 
-class GoGuruWriteRunningCommand(sublime_plugin.TextCommand):
-    """ Writes the guru output to the current view.
+class GoRenameWriteRunningCommand(sublime_plugin.TextCommand):
+    """ Writes the gorename output to the current view.
     """
 
     def run(self, edit, mode):
         view = self.view
 
-        content = "Running guru " + mode + " command...\n"
+        content = "Running gorename " + mode + " command...\n"
         view.set_viewport_position(view.text_to_layout(view.size() - 1))
 
         view.insert(edit, view.size(), content)
 
 
-class GoGuruShowResultsCommand(sublime_plugin.TextCommand):
+class GoRenameShowResultsCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         if get_setting("output", "buffer") == "output_panel":
             self.view.window().run_command('show_panel', {'panel': "output.Oracle Output" })
@@ -286,7 +286,7 @@ class GoGuruShowResultsCommand(sublime_plugin.TextCommand):
             self.view.window().focus_view(output_view)
 
 
-class GoGuruOpenResultCommand(sublime_plugin.EventListener):
+class GoRenameOpenResultCommand(sublime_plugin.EventListener):
     def on_selection_modified(self, view):
       if view.name() == "Oracle Output":
         if len(view.sel()) != 1:
@@ -301,7 +301,7 @@ class GoGuruOpenResultCommand(sublime_plugin.EventListener):
         line = view.full_line(lines[0])
         text = view.substr(line)
 
-        format = get_setting("guru_format")
+        format = get_setting("gorename_format")
 
         # "filename:line:col" pattern for json
         m = re.search("\"([^\"]+):([0-9]+):([0-9]+)\"", text)
@@ -342,7 +342,7 @@ def get_output_view(window):
     view.set_scratch(True)
     view_settings = view.settings()
     view_settings.set('line_numbers', False)
-    view.set_syntax_file('Packages/GoGuru/GoGuruResults.tmLanguage')
+    view.set_syntax_file('Packages/GoRename/GoRenameResults.tmLanguage')
 
     return view
 
@@ -353,7 +353,7 @@ def get_setting(key, default=None):
 
     val = None
     try:
-       val = sublime.active_window().active_view().settings().get('GoGuru', {}).get(key)
+       val = sublime.active_window().active_view().settings().get('GoRename', {}).get(key)
     except AttributeError:
         pass
 
