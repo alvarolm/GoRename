@@ -13,7 +13,13 @@ useful for refactoring.
 Usage
 -----
 
-Place the cursor over the identifier you want to rename (could be a variable, method, etc.) and press CTRL+ALT+R, then using the up and down keys select the optional flags to be used with ENTER, once you're done press ESC, type the new name and press ENTER, then review the parameters and press ENTER again to confirm and execute the gorename tool.
+1) Place the cursor over the identifier you want to rename (could be a variable, method, etc.).
+
+2) press CTRL+ALT+R, then using the up and down keys select the optional flags to be used with ENTER, once you're done press ESC or click away.
+
+3) type the new name and press ENTER
+
+4) then review the parameters and press ENTER again to confirm and execute the gorename tool.
 
 (If by any chance the results panel disappears just press CTRL+SHIFT+ALT+R)
 
