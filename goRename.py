@@ -128,6 +128,9 @@ class GoRenameCommand(sublime_plugin.TextCommand):
                 enabledTitle = ''
             global flags
 
+            # reset 
+            flags = ''
+
             if s:
                 compiled_flags_array.append(enabledTitle+'Simulate (-d)')
                 flags = '-d '
@@ -136,15 +139,15 @@ class GoRenameCommand(sublime_plugin.TextCommand):
 
             if f:
                 compiled_flags_array.append(enabledTitle+'force (-force)')
-                flags = flags + '-froce '
+                flags = flags + '-force '
             elif not only_enabled:
                 compiled_flags_array.append('DISABLED: force (-force)')
 
             if v:
-                compiled_flags_array.append(enabledTitle+'verbose (-verbose)')
-                flags = flags + '-verbose'
+                compiled_flags_array.append(enabledTitle+'verbose (-v)')
+                flags = flags + '-v'
             elif not only_enabled:
-                compiled_flags_array.append('DISABLED: verbose (-verbose)')
+                compiled_flags_array.append('DISABLED: verbose (-v)')
             return compiled_flags_array
             
         def rename_name_input(name):
