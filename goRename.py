@@ -18,6 +18,7 @@ PluginPath = ''
 use_golangconfig = False
 # holds renaming parameters
 renameMe = {}
+runningTool = False
 
 def log(*msg):
     print("GoRename:", msg[0:])
@@ -89,12 +90,16 @@ class GoRenameCommand(sublime_plugin.TextCommand):
         # ...
     def run(self, edit, simulate=False, force=False, verbose=False):
 
-        current_selection = self.view.sel()
-        region = current_selection[0]
-        text = self.view.substr(sublime.Region(0, region.end()))
-        cb_map = self.get_map(text)
-        byte_end = cb_map[sorted(cb_map.keys())[-1]]
-        byte_begin = None
+        try:
+            current_selection = self.view.sel()
+            region = current_selection[0]
+            text = self.view.substr(sublime.Region(0, region.end()))
+            cb_map = self.get_map(text)
+            byte_end = cb_map[sorted(cb_map.keys())[-1]]
+            byte_begin = None
+        except:
+            debug("couldn't obtain selection refernce:", sys.exc_info()[0])
+
         if not region.empty(): 
             byte_begin = cb_map[region.begin()-1]
         else:
@@ -241,6 +246,9 @@ class GoRenameCommand(sublime_plugin.TextCommand):
         """ Builds the gorename shell command and calls it, returning it's output as a string.
         """
 
+        global runningTool
+        runningTool = True
+
         pos = "#" + str(begin_offset)
 
         # golangconfig or shellenv ?
@@ -282,23 +290,33 @@ class GoRenameCommand(sublime_plugin.TextCommand):
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, shell=True, env=env)
         out, err = proc.communicate()
         callback(out.decode('utf-8'), err.decode('utf-8'))
+        global runningTool
+        runningTool = False
 
 class GoRenameConfirmCommand(sublime_plugin.TextCommand):
     """ Writes the gorename output to the current view.
     """
 
     def run(self, edit):
+        global renameMe
         #view = self.view
         debug('Stored rename parameters:', renameMe)
         # check that the referenced file hasn't changed
-        if ((hashlib.sha256(open(renameMe['file_path'],'rb').read()).hexdigest() != renameMe['checksum']) and (get_setting('rename_modified_files', False) == False)):
-            sublime.error_message("Couldn't execute gorename, the referenced file has changed, please start over.")
-            # reset renameMe
-            global renameMe
-            renameMe = {}
+
+        if (len(renameMe)==0):
+            sublime.error_message("Invalid GoRename parameters")
+        if (runningTool == False):
+            if ((hashlib.sha256(open(renameMe['file_path'],'rb').read()).hexdigest() != renameMe['checksum']) and (get_setting('rename_modified_files', False) == False)):
+                sublime.error_message("Couldn't execute gorename, the referenced file has changed, please start over.")
+                # reset renameMe
+                renameMe = {}
+            else:
+                GR = GoRenameCommand(self)
+                GR.gorename(file_path=renameMe['file_path'] ,begin_offset=renameMe['offset'], name=renameMe['name'], flags=renameMe['flags'], callback=GR.gorename_complete)
+                # reset renameMe
+                renameMe = {}
         else:
-            GR = GoRenameCommand(self)
-            GR.gorename(file_path=renameMe['file_path'] ,begin_offset=renameMe['offset'], name=renameMe['name'], flags=renameMe['flags'], callback=GR.gorename_complete)
+            sublime.message_dialog("GoRename tool already executing")
         
 
 
