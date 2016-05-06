@@ -1,7 +1,7 @@
 GoRename [![documentation](https://img.shields.io/badge/info-documentation-blue.svg)](http://alvarolm.github.io/GoRename/)
 =========
 
-GoRename is a Golang plugin for [SublimeText](http://www.sublimetext.com/) 3 that integrates the Go [guru](https://godoc.org/golang.org/x/tools/cmd/gorename) tool.
+GoRename is a Golang plugin for [SublimeText](http://www.sublimetext.com/) 3 that integrates the Go [rename](https://godoc.org/golang.org/x/tools/cmd/gorename) tool.
 
 ```
 The gorename command performs precise type-safe renaming of identifiers in Go source code.
@@ -17,9 +17,9 @@ Usage
 
 2) press CTRL+ALT+R, then using the up and down keys select the optional flags to be used with ENTER, once you're done press ESC or click away.
 
-3) type the new name and press ENTER
+3) type the new name and press ENTER.
 
-4) then review the parameters and press ENTER again to confirm and execute the gorename tool.
+4) review the parameters and press ENTER again to confirm and execute the gorename tool.
 
 (If by any chance the results panel disappears just press CTRL+SHIFT+ALT+R)
 
