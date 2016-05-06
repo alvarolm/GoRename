@@ -1,0 +1,163 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Gorename by alvarolm</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Gorename</h1>
+        <p>GoRename is a Golang plugin for SublimeText 3 that integrates the Go gorename tool.</p>
+
+        <p class="view"><a href="https://github.com/alvarolm/GoRename">View the Project on GitHub <small>alvarolm/GoRename</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/alvarolm/GoRename/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/alvarolm/GoRename/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/alvarolm/GoRename">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a id="gorename-" class="anchor" href="#gorename-" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>GoRename </h1>
+
+<p>GoRename is a Golang plugin for <a href="http://www.sublimetext.com/">SublimeText</a> 3 that integrates the Go <a href="https://godoc.org/golang.org/x/tools/cmd/gorename">gorename</a> tool.</p>
+
+<pre><code>The gorename command performs precise type-safe renaming of identifiers in Go source code.
+</code></pre>
+
+<p>useful for refactoring.</p>
+
+<p>(based on previus work from <a href="http://github.com/waigani/GoOracle">waigani</a>)</p>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>1) Place the cursor over the identifier you want to rename (could be a variable, method, etc.).</p>
+
+<p>2) press CTRL+ALT+R, then using the up and down keys select the optional flags to be used with ENTER, once you're done press ESC or click away.</p>
+
+<p>3) type the new name and press ENTER.</p>
+
+<p>4) review the parameters and press ENTER again to confirm and execute the gorename tool.</p>
+
+<p>(If by any chance the results panel disappears just press CTRL+SHIFT+ALT+R)</p>
+
+<p>configurable flags:</p>
+
+<pre><code>-force     causes the renaming to proceed even if conflicts were reported.
+           The resulting program may be ill-formed, or experience a change
+           in behaviour.
+
+           WARNING: this flag may even cause the renaming tool to crash.
+           (In due course this bug will be fixed by moving certain
+           analyses into the type-checker.)
+
+-d         display diffs instead of rewriting files
+
+-v         enables verbose logging.
+</code></pre>
+
+<h2>
+<a id="install" class="anchor" href="#install" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Install</h2>
+
+<p>Install Sublime Package Control (if you haven't done so already) from <a href="http://wbond.net/sublime_packages/package_control">http://wbond.net/sublime_packages/package_control</a>. Be sure to restart ST to complete the installation.</p>
+
+<p>Bring up the command palette (default ctrl+shift+p or cmd+shift+p) and start typing Package Control: 'Install Package' then press return or click on that option to activate it. You will be presented with a new Quick Panel with the list of available packages. Type 'GoRename' and press return or click on its entry to install GoRename. If there is no entry for 'GoRename', you most likely already have it installed.</p>
+
+<p>GoOracle has several variables to be set in order to work. These are explained in the comments of the default settings <code>Preferences &gt; Package Settings &gt; GoOracle &gt; Settings-Default</code>:</p>
+
+<div class="highlight highlight-source-js"><pre>{
+    <span class="pl-c">// rename files that had been modified after the 'go_rename' command has been executed.</span>
+    <span class="pl-c">// (DO NOT set to true unless you want a renaming nightmare)</span>
+    <span class="pl-s"><span class="pl-pds">"</span>rename_modified_files<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">false</span>,
+
+    <span class="pl-c">// use golangconfig, if false then shellenv will be used to get golang environment variables</span>
+    <span class="pl-s"><span class="pl-pds">"</span>use_golangconfig<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">false</span>,
+
+    <span class="pl-c">// The output can either be one of: 'buffer', 'output_panel'</span>
+    <span class="pl-c">// Buffers can hold results from more than one invocation</span>
+    <span class="pl-c">// Output panels sit underneath the editor area and are easily dismissed</span>
+    <span class="pl-s"><span class="pl-pds">"</span>output<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>output_panel<span class="pl-pds">"</span></span>,
+
+    <span class="pl-c">// print debug info to the terminal</span>
+    <span class="pl-s"><span class="pl-pds">"</span>debug<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">false</span>,
+
+    <span class="pl-c">// env overwrites the default shell environment vars</span>
+    <span class="pl-c">// e.g "env": { "GOPATH": "$HOME/go/bin:$PATH" }</span>
+    <span class="pl-c">// not used when use_golangconfig is set to true</span>
+    <span class="pl-s"><span class="pl-pds">"</span>env<span class="pl-pds">"</span></span><span class="pl-k">:</span> {},
+
+    <span class="pl-c">// guru_scope is an array of scopes of analysis for guru.</span>
+    <span class="pl-c">// e.g (for github.com/juju/juju) "guru_scope": ["github.com/juju/juju/cmd/juju", "github.com/juju/juju/cmd/jujud"]</span>
+    <span class="pl-c">// not used when use_golangconfig is set to true</span>
+    <span class="pl-s"><span class="pl-pds">"</span>gorename_scope<span class="pl-pds">"</span></span><span class="pl-k">:</span> [],
+}</pre></div>
+
+<p>You set your own variables in <code>Preferences &gt; Package Settings &gt; GoRename &gt; Settings-User</code>.</p>
+
+<p>You can also make project specific settings. First save your current workspace as a project <code>Project &gt; Save as project ...</code>, then edit your project <code>Project &gt; Edit Project</code>. Below is an example which sets up GoOracle to be used on the <a href="https://github.com/juju/juju">github.com/juju/juju</a> codebase:</p>
+
+<div class="highlight highlight-source-js"><pre>{
+    <span class="pl-s"><span class="pl-pds">"</span>folders<span class="pl-pds">"</span></span><span class="pl-k">:</span>
+    [
+        {
+            <span class="pl-s"><span class="pl-pds">"</span>follow_symlinks<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">true</span>,
+            <span class="pl-s"><span class="pl-pds">"</span>path<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>/home/user/go/src/github.com/juju/juju<span class="pl-pds">"</span></span>
+        }
+    ],
+    <span class="pl-s"><span class="pl-pds">"</span>settings<span class="pl-pds">"</span></span><span class="pl-k">:</span>
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>GoRename<span class="pl-pds">"</span></span><span class="pl-k">:</span> {
+            <span class="pl-s"><span class="pl-pds">"</span>gorename_scope<span class="pl-pds">"</span></span><span class="pl-k">:</span> [<span class="pl-s"><span class="pl-pds">"</span>github.com/juju/juju/cmd/juju<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>github.com/juju/juju/cmd/jujud<span class="pl-pds">"</span></span>],
+            <span class="pl-s"><span class="pl-pds">"</span>output<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>output_panel<span class="pl-pds">"</span></span>
+        }
+    },
+}</pre></div>
+
+<p>Default key binding:</p>
+
+<div class="highlight highlight-source-js"><pre>[
+    { <span class="pl-s"><span class="pl-pds">"</span>keys<span class="pl-pds">"</span></span><span class="pl-k">:</span> [<span class="pl-s"><span class="pl-pds">"</span>ctrl+alt+r<span class="pl-pds">"</span></span>], <span class="pl-s"><span class="pl-pds">"</span>command<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>go_rename<span class="pl-pds">"</span></span>},
+    { <span class="pl-s"><span class="pl-pds">"</span>keys<span class="pl-pds">"</span></span><span class="pl-k">:</span> [<span class="pl-s"><span class="pl-pds">"</span>ctrl+alt+shift+r<span class="pl-pds">"</span></span>], <span class="pl-s"><span class="pl-pds">"</span>command<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>go_rename_show_results<span class="pl-pds">"</span></span>},
+
+    { <span class="pl-s"><span class="pl-pds">"</span>keys<span class="pl-pds">"</span></span><span class="pl-k">:</span> [<span class="pl-s"><span class="pl-pds">"</span>enter<span class="pl-pds">"</span></span>], <span class="pl-s"><span class="pl-pds">"</span>command<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>go_rename_confirm<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>context<span class="pl-pds">"</span></span><span class="pl-k">:</span> 
+    [{ <span class="pl-s"><span class="pl-pds">"</span>key<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>selector<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>operator<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>equal<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>operand<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>text.gorename-results<span class="pl-pds">"</span></span> }]
+    }
+]</pre></div>
+
+<p>You can set your own key binding by copying the above into <code>Preferences &gt; Keybindings - User</code> and replacing ctrl+shift+g with your preferred key(s).</p>
+
+<h2>
+<a id="dependencies" class="anchor" href="#dependencies" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Dependencies</h2>
+
+<p>GoRename relies on the gorename tool. You must install it in order for Gorename to work. Run the following on your command line:</p>
+
+<p><code>go get -u golang.org/x/tools/cmd/gorename</code></p>
+
+<h1>
+<a id="copyright-license--contributors" class="anchor" href="#copyright-license--contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Copyright, License &amp; Contributors</h1>
+
+<p>GoRename is released under the MIT license. See <a href="LICENSE.md">LICENSE.md</a></p>
+
+<p>GoRename is the copyrighted work of <em>The GoRename Authors</em> i.e me (<a href="https://github.com/alvarolm/GoRename">alvarolm</a>) and <em>all</em> contributors. If you submit a change, be it documentation or code, so long as it's committed to GoRename's history I consider you a contributor. See <a href="AUTHORS.md">AUTHORS.md</a> for a list of all the GoRename authors/contributors.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/alvarolm">alvarolm</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
