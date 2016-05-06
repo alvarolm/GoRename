@@ -43,18 +43,16 @@ GoOracle has several variables to be set in order to work. These are explained i
 
 ```javascript
 {
-	// env overwrites the default shell environment vars
-	// e.g "env": { "GOPATH": "$HOME/go/bin:$PATH" }
-	"env": {},
+	// rename files that had been modified after the 'go_rename' command has been executed.
+	// (DO NOT set to true unless you want a renaming nightmare)
+	"rename_modified_files": false,
 
 	// use golangconfig, if false then shellenv will be used to get golang environment variables
 	"use_golangconfig": false,
 
-	// use_current_package adds to the guru_scope the current package of the the working file
-	"use_current_package" : true,
-
-	// besides showing the result, jump directly to the definition
-	"jumpto_definition": true,
+	// env overwrites the default shell environment vars
+	// e.g "env": { "GOPATH": "$HOME/go/bin:$PATH" }
+	"env": {},
 
 	// The output can either be one of: 'buffer', 'output_panel'
 	// Buffers can hold results from more than one invocation
@@ -62,14 +60,11 @@ GoOracle has several variables to be set in order to work. These are explained i
 	"output": "output_panel",
 
 	// print debug info to the terminal
-	"debug": true,
+	"debug": false,
 
 	// guru_scope is an array of scopes of analysis for guru.
 	// e.g (for github.com/juju/juju) "guru_scope": ["github.com/juju/juju/cmd/juju", "github.com/juju/juju/cmd/jujud"]
-	"guru_scope": [],
-
-	// Set guru's output to json
-	"guru_json": false,
+	"gorename_scope": [],
 }
 ```
 You set your own variables in `Preferences > Package Settings > GoGuru > Settings-User`.

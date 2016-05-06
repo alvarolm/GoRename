@@ -214,10 +214,7 @@ class GoRenameCommand(sublime_plugin.TextCommand):
         #window = self.view.window()
         window = sublime.active_window()
         view = get_output_view(window)
-
-        log('result!!!', result)
-        log('err!!!', err)
-
+        
         # Run a new command to use the edit object for this view.
         view.run_command('go_rename_write_results', {
             'result': result,
@@ -292,10 +289,16 @@ class GoRenameConfirmCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         #view = self.view
-        sublime.error_message('executing GoRename')
-        print(renameMe)
-        GR = GoRenameCommand(self)
-        GR.gorename(file_path=renameMe['file_path'] ,begin_offset=renameMe['offset'], name=renameMe['name'], flags=renameMe['flags'], callback=GR.gorename_complete)
+        debug('Stored rename parameters:', renameMe)
+        # check that the referenced file hasn't changed
+        if ((hashlib.sha256(open(renameMe['file_path'],'rb').read()).hexdigest() != renameMe['checksum']) and (get_setting('rename_modified_files', False) == False)):
+            sublime.error_message("Couldn't execute gorename, the referenced file has changed, please start over.")
+            # reset renameMe
+            global renameMe
+            renameMe = {}
+        else:
+            GR = GoRenameCommand(self)
+            GR.gorename(file_path=renameMe['file_path'] ,begin_offset=renameMe['offset'], name=renameMe['name'], flags=renameMe['flags'], callback=GR.gorename_complete)
         
 
 
