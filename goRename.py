@@ -5,16 +5,19 @@
 """
 GoRename is a Go gorename plugin for Sublime Text 3.
 It depends on the gorename tool being installed:
-go get golang.org/x/tools/cmd/gorename
+go get -u golang.org/x/tools/cmd/gorename
 """
 
-import sublime, sublime_plugin, subprocess, time, re, os, subprocess, sys
+# TODO: review & clean
+
+import sublime, sublime_plugin, subprocess, time, re, os, subprocess, sys, time, hashlib
 
 DEBUG = False
 VERSION = ''
 PluginPath = ''
 use_golangconfig = False
-
+# holds renaming parameters
+renameMe = {}
 
 def log(*msg):
     print("GoRename:", msg[0:])
@@ -83,76 +86,137 @@ def plugin_loaded():
 class GoRenameCommand(sublime_plugin.TextCommand):
     def __init__(self, view):
         self.view = view 
-        self.mode = 'None'
-    def run(self, edit, mode=None):
+        # ...
+    def run(self, edit, simulate=False, force=False, verbose=False):
 
-        region = self.view.sel()[0]
+        current_selection = self.view.sel()
+        region = current_selection[0]
         text = self.view.substr(sublime.Region(0, region.end()))
         cb_map = self.get_map(text)
         byte_end = cb_map[sorted(cb_map.keys())[-1]]
         byte_begin = None
         if not region.empty(): 
             byte_begin = cb_map[region.begin()-1]
+        else:
+            byte_begin = byte_end
+        
+        word = self.view.substr(self.view.word(region.begin())).rstrip()
+        position = self.view.rowcol(region.begin())
+        line_number = position[0]+1
+        del position
+        line_string = self.view.substr(self.view.line(region))
 
-        if mode:
-            self.write_running(mode)
-            self.gorename(byte_end, begin_offset=byte_begin, mode=mode, callback=self.gorename_complete)
+
+
+        # TODO: improve preliminary identifier validation
+        if len(word) == 0:
+            self.view.show_popup('<b>Gorename</b>:<br/> Invalid identifier:\nno identifier here.')
             return
 
-        # Get the gorename mode from the user.
-        modes = ["callees","callers","callstack","definition","describe","freevars","implements","peers","pointsto","referrers","what","callgraph"]
-        descriptions  = [
-            "callees     show possible targets of selected function call",
-            "callers     show possible callers of selected function",
-            "callstack   show path from callgraph root to selected function",
-            "definition  show declaration of selected identifier",
-            "describe    describe selected syntax: definition, methods, etc",
-            "freevars    show free variables of selection",
-            "implements  show 'implements' relation for selected type or method",
-            "peers       show send/receive corresponding to selected channel op",
-            "pointsto    show variables the selected pointer may point to",
-            "referrers   show all refs to entity denoted by selected identifier",
-            "what        show basic information about the selected syntax node",
-            "callgraph   show complete callgraph of program"]
+        message = 'Running GoRename [press ENTER to continue]:\nFrom %s to %s\n[Line Number: %s][Byte Offset: %s]\nFlags: %s\nReference:\n%s'
 
-        # Call gorename cmd with the given mode.
-        def on_done(i):
-            if i >= 0 :
-                self.write_running(modes[i])
+        global s, f, v, flags
+        s = simulate
+        f = force
+        v = verbose
+        flags = ''
 
-                self.gorename(byte_end, begin_offset=byte_begin, mode=modes[i], callback=self.gorename_complete)
+        def compile_flags(only_enabled=False): # and construct flags argument
+            compiled_flags_array = []
+            enabledTitle = 'ENABLED: '
+            if only_enabled:
+                enabledTitle = ''
+            global flags
 
-        self.view.window().show_quick_panel(descriptions, on_done, sublime.MONOSPACE_FONT)
+            if s:
+                compiled_flags_array.append(enabledTitle+'Simulate (-d)')
+                flags = '-d '
+            elif not only_enabled:
+                compiled_flags_array.append('DISABLED: Simulate (-d)')
 
-    def gorename_complete(self, out, err):
+            if f:
+                compiled_flags_array.append(enabledTitle+'force (-force)')
+                flags = flags + '-froce '
+            elif not only_enabled:
+                compiled_flags_array.append('DISABLED: force (-force)')
+
+            if v:
+                compiled_flags_array.append(enabledTitle+'verbose (-verbose)')
+                flags = flags + '-verbose'
+            elif not only_enabled:
+                compiled_flags_array.append('DISABLED: verbose (-verbose)')
+            return compiled_flags_array
+            
+        def rename_name_input(name):
+            debug('flags:', flags)
+
+            self.write_running(message % (word, name, line_number, byte_begin, compile_flags(True), line_string), True, True) 
+            global renameMe
+            renameMe['offset'] = byte_begin
+            renameMe['name'] = name
+            renameMe['flags'] = flags
+            renameMe['file_path'] = self.view.file_name()
+            renameMe['checksum'] = hashlib.sha256(open(renameMe['file_path'],'rb').read()).hexdigest() 
+
+        def popup_menu_callback(flag_opt):
+            global s,f,v
+            if flag_opt == 0:
+                s = not s 
+            elif flag_opt == 1:
+                f = not f
+            elif flag_opt == 2:
+                v = not v
+            if flag_opt != -1:
+                pop_menu()
+            else: 
+                self.view.window().show_input_panel('GoRename: rename "%s" (from line %s) to' % (word, line_number), '', rename_name_input, on_change=None, on_cancel=None)
+
+        def pop_menu():
+            self.view.show_popup_menu(compile_flags(), popup_menu_callback)
+
+        pop_menu()
+
+        
+
+    def gorename_complete(self, out, err, focus=False):
         self.write_out(out, err)
 
-    def write_running(self, mode):
+    def write_running(self, content, readonly=False, focus=False):
         """ Write the "Running..." header to a new file and focus it to get results
         """
-        # remember mode for future actions
-        self.mode = mode
 
         window = self.view.window()
         view = get_output_view(window)
+        view.set_read_only(False)
 
         # Run a new command to use the edit object for this view.
-        view.run_command('go_gorename_write_running', {'mode': mode})
+        view.run_command('go_rename_write_running', {'content': content})
 
         if get_setting("output", "buffer") == "output_panel":
             window.run_command('show_panel', {'panel': "output." + view.name() })
         else:
             window.focus_view(view)
 
+        view.set_read_only(readonly)
+
+        # focus no matter what
+        if focus:
+            window.focus_view(view)
+
     def write_out(self, result, err):
+
         """ Write the gorename output to a new file.
         """
 
-        window = self.view.window()
+        #window = self.view.window()
+        window = sublime.active_window()
         view = get_output_view(window)
 
+        log('result!!!', result)
+        log('err!!!', err)
+
         # Run a new command to use the edit object for this view.
-        view.run_command('go_gorename_write_results', {
+        view.run_command('go_rename_write_results', {
             'result': result,
             'err': err})
 
@@ -160,16 +224,6 @@ class GoRenameCommand(sublime_plugin.TextCommand):
             window.run_command('show_panel', {'panel': "output." + view.name() })
         else:
             window.focus_view(view)
-
-        # jump to definition if is set
-        if self.mode == 'definition':
-            if get_setting("jumpto_definition", False):
-                if result:
-                    coordinates = result.split(':')[:3]
-                    new_view = window.open_file(':'.join(coordinates), sublime.ENCODED_POSITION)
-                    group, _ = window.get_view_index(new_view)
-                    if group != -1:
-                        window.focus_group(group)
 
     def get_map(self, chars):
         """ Generate a map of character offset to byte offset for the given string 'chars'.
@@ -183,17 +237,13 @@ class GoRenameCommand(sublime_plugin.TextCommand):
             byte_offset += len(char.encode('utf-8'))
         return cb_map
 
-    def gorename(self, end_offset, begin_offset=None, mode="describe", callback=None):
+    def gorename(self, file_path, begin_offset=None, flags=None, name=None, callback=None):
         """ Builds the gorename shell command and calls it, returning it's output as a string.
         """
 
-        pos = "#" + str(end_offset)
-        if begin_offset is not None:
-            pos = "#%i,#%i" %(begin_offset, end_offset)
+        pos = "#" + str(begin_offset)
 
-        file_path = self.view.file_name()
-
-        # golang config or shellenv ?
+        # golangconfig or shellenv ?
         cmd_env = ''
         if use_golangconfig:
             try:
@@ -211,32 +261,19 @@ class GoRenameCommand(sublime_plugin.TextCommand):
 
         gorename_scope = ",".join(get_setting("gorename_scope", ""))
 
-        # add local package to gorename scope
-        if get_setting("use_current_package", True) :
-            current_file_path = os.path.realpath(os.path.dirname(file_path))
-            GOPATH = os.path.realpath(cmd_env["GOPATH"]+"/src")+"/"
-            local_package = current_file_path.replace(GOPATH, "")
-            debug("current_file_path", current_file_path)
-            debug("GOPATH", GOPATH)
-            debug("local_package", local_package)
-            gorename_scope = gorename_scope+','+local_package
-        gorename_scope = gorename_scope.strip()
-        debug("gorename_scope", gorename_scope)
-        if len(gorename_scope) > 0:
-            gorename_scope = "-scope "+gorename_scope
 
         gorename_json = ""
         if get_setting("gorename_json", False):
             gorename_json = "-json"
 
         # Build gorename cmd.
-        cmd = "%(toolpath)s %(scope)s %(gorename_json)s %(mode)s %(file_path)s:%(pos)s" % {
+        cmd = "%(toolpath)s -offset %(file_path)s:%(pos)s -to %(name)s %(flags)s" % {
         "toolpath": toolpath,
         "file_path": file_path,
         "pos": pos,
-        "gorename_json": gorename_json,
-        "mode": mode,
-        "scope": gorename_scope} 
+        "name": name,
+        "flags": flags} 
+
         debug("cmd", cmd)
 
         sublime.set_timeout_async(lambda: self.runInThread(cmd, callback, cmd_env), 0)
@@ -246,6 +283,18 @@ class GoRenameCommand(sublime_plugin.TextCommand):
         out, err = proc.communicate()
         callback(out.decode('utf-8'), err.decode('utf-8'))
 
+class GoRenameConfirmCommand(sublime_plugin.TextCommand):
+    """ Writes the gorename output to the current view.
+    """
+
+    def run(self, edit):
+        #view = self.view
+        sublime.error_message('executing GoRename')
+        print(renameMe)
+        GR = GoRenameCommand(self)
+        GR.gorename(file_path=renameMe['file_path'] ,begin_offset=renameMe['offset'], name=renameMe['name'], flags=renameMe['flags'], callback=GR.gorename_complete)
+        
+
 
 class GoRenameWriteResultsCommand(sublime_plugin.TextCommand):
     """ Writes the gorename output to the current view.
@@ -254,77 +303,86 @@ class GoRenameWriteResultsCommand(sublime_plugin.TextCommand):
     def run(self, edit, result, err):
         view = self.view
 
-        view.insert(edit, view.size(), "\n")
+        view.set_read_only(False)
 
         if result:
             view.insert(edit, view.size(), result)
         if err:
-            view.insert(edit, view.size(), err)
+            errLen = view.insert(edit, view.size(), err)
+        
+        view.set_read_only(True)
 
-        view.insert(edit, view.size(), "\n\n\n")
+        # reset
+        global renameMe
+        renameMe = {}
         
 
 class GoRenameWriteRunningCommand(sublime_plugin.TextCommand):
     """ Writes the gorename output to the current view.
     """
 
-    def run(self, edit, mode):
+    def run(self, edit, content):
         view = self.view
 
-        content = "Running gorename " + mode + " command...\n"
         view.set_viewport_position(view.text_to_layout(view.size() - 1))
-
         view.insert(edit, view.size(), content)
 
 
 class GoRenameShowResultsCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         if get_setting("output", "buffer") == "output_panel":
-            self.view.window().run_command('show_panel', {'panel': "output.Oracle Output" })
+            self.view.window().run_command('show_panel', {'panel': "output.GoRename Output" })
         else:
             output_view = get_output_view(self.view.window())
             self.view.window().focus_view(output_view)
 
 
 class GoRenameOpenResultCommand(sublime_plugin.EventListener):
+
+    '''
+    def on_modification(self, view):
+        if view.name() == "GoRename Output":
+            log("on modif")
+    '''
+
     def on_selection_modified(self, view):
-      if view.name() == "Oracle Output":
-        if len(view.sel()) != 1:
-            return
-        if view.sel()[0].size() == 0:
-            return
+        if view.name() == "GoRename Output":
+            if len(view.sel()) != 1:
+                return
+            if view.sel()[0].size() == 0:
+                return
 
-        lines = view.lines(view.sel()[0])
-        if len(lines) != 1:
-            return
+            lines = view.lines(view.sel()[0])
+            if len(lines) != 1:
+                return
 
-        line = view.full_line(lines[0])
-        text = view.substr(line)
+            line = view.full_line(lines[0])
+            text = view.substr(line)
 
-        format = get_setting("gorename_format")
+            format = get_setting("gorename_format")
 
-        # "filename:line:col" pattern for json
-        m = re.search("\"([^\"]+):([0-9]+):([0-9]+)\"", text)
+            # "filename:line:col" pattern for json
+            m = re.search("\"([^\"]+):([0-9]+):([0-9]+)\"", text)
 
-        # >filename:line:col< pattern for xml
-        if m == None:
-            m = re.search(">([^<]+):([0-9]+):([0-9]+)<", text)
+            # >filename:line:col< pattern for xml
+            if m == None:
+                m = re.search(">([^<]+):([0-9]+):([0-9]+)<", text)
 
-        # filename:line.col-line.col: pattern for plain
-        if m == None:
-            m = re.search("^([^:]+):([0-9]+).([0-9]+)[-: ]", text)
-        
-        if m:
-            w = view.window()
-            new_view = w.open_file(m.group(1) + ':' + m.group(2) + ':' + m.group(3), sublime.ENCODED_POSITION)
-            group, index = w.get_view_index(new_view)
-            if group != -1:
-                w.focus_group(group)
+            # filename:line.col-line.col: pattern for plain
+            if m == None:
+                m = re.search("^([^:]+):([0-9]+).([0-9]+)[-: ]", text)
+            
+            if m:
+                w = view.window()
+                new_view = w.open_file(m.group(1) + ':' + m.group(2) + ':' + m.group(3), sublime.ENCODED_POSITION)
+                group, index = w.get_view_index(new_view)
+                if group != -1:
+                    w.focus_group(group)
 
 
 def get_output_view(window):
     view = None
-    buff_name = 'Oracle Output'
+    buff_name = 'GoRename Output'
 
     if get_setting("output", "buffer") == "output_panel":
         view = window.create_output_panel(buff_name)

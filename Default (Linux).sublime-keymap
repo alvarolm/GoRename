@@ -1,7 +1,17 @@
 [
     { "keys": ["ctrl+alt+r"], "command": "go_rename"},
-    { "keys": ["ctrl+alt+shift+r"], "command": "go_rename_show_results"}
+    { "keys": ["ctrl+alt+shift+r"], "command": "go_rename_show_results"},
+
+
+
+	{ "keys": ["enter"], "command": "go_rename_confirm", "context": 
+	[{ "key": "selector", "operator": "equal", "operand": "text.gorename-results" }]
+	}
+
+
 ]
+
+
 /*
 	You can also set a key binding for a specific mode by adding a "mode" arg, e.g.:
     ...

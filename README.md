@@ -1,46 +1,43 @@
-GoGuru [![documentation](https://img.shields.io/badge/info-documentation-blue.svg)](http://alvarolm.github.io/GoGuru/)
+GoRename [![documentation](https://img.shields.io/badge/info-documentation-blue.svg)](http://alvarolm.github.io/GoRename/)
 =========
 
-GoGuru is a Golang plugin for [SublimeText](http://www.sublimetext.com/) 3 that integrates the Go [guru](https://godoc.org/golang.org/x/tools/cmd/guru) tool.
+GoRename is a Golang plugin for [SublimeText](http://www.sublimetext.com/) 3 that integrates the Go [guru](https://godoc.org/golang.org/x/tools/cmd/gorename) tool.
 
-based on previus work from [waigani](http://github.com/waigani/GoOracle).
+```
+The gorename command performs precise type-safe renaming of identifiers in Go source code.
+```
+useful for refactoring.
 
-the guru tool still is on developent,
-check out the plan, the official git repo and the code review if you want to keep up:
-* https://docs.google.com/document/d/1UErU12vR7jTedYvKHVNRzGPmXqdMASZ6PfE7B-p6sIg/edit#
-* https://go.googlesource.com/tools/+log/master/cmd/guru
-* https://go-review.googlesource.com/#/q/guru
-
+(based on previus work from [waigani](http://github.com/waigani/GoOracle))
 
 Usage
 -----
 
-Select, or place your cursor over, a symbol (function, variable, constant etc) and press `ctrl+shift+g`. You will be presented with the following modes of analysis to choose from:
+Place the cursor over the identifier you want to rename (could be a variable, method, etc.) and press CTRL+ALT+R, then using the up and down keys select the optional flags to be used with ENTER, once you're done press ESC, type the new name and press ENTER, then review the parameters and press ENTER again to confirm and execute the gorename tool.
 
+(If by any chance the results panel disappears just press CTRL+SHIFT+ALT+R)
+
+configurable flags:
 ```
-	callees	  	show possible targets of selected function call
-	callers	  	show possible callers of selected function
-	callstack 	show path from callgraph root to selected function
-	definition	show declaration of selected identifier
-	describe  	describe selected syntax: definition, methods, etc
-	freevars  	show free variables of selection
-	implements	show 'implements' relation for selected type or method
-	peers     	show send/receive corresponding to selected channel op
-	pointsto	show variables the selected pointer may point to
-	referrers 	show all refs to entity denoted by selected identifier
-	what		show basic information about the selected syntax node
-	whicherrs	show possible values of the selected error variable
+-force     causes the renaming to proceed even if conflicts were reported.
+           The resulting program may be ill-formed, or experience a change
+           in behaviour.
+
+           WARNING: this flag may even cause the renaming tool to crash.
+           (In due course this bug will be fixed by moving certain
+           analyses into the type-checker.)
+
+-d         display diffs instead of rewriting files
+
+-v         enables verbose logging.
 ```
-
-Select one and the output will be displayed in a new tab.
-
 
 Install
 -------
 
 Install Sublime Package Control (if you haven't done so already) from http://wbond.net/sublime_packages/package_control. Be sure to restart ST to complete the installation.
 
-Bring up the command palette (default ctrl+shift+p or cmd+shift+p) and start typing Package Control: Install Package then press return or click on that option to activate it. You will be presented with a new Quick Panel with the list of available packages. Type GoGuru and press return or on its entry to install GoGuru. If there is no entry for GoGuru, you most likely already have it installed.
+Bring up the command palette (default ctrl+shift+p or cmd+shift+p) and start typing Package Control: 'Install Package' then press return or click on that option to activate it. You will be presented with a new Quick Panel with the list of available packages. Type 'GoRename' and press return or click on its entry to install GoRename. If there is no entry for 'GoRename', you most likely already have it installed.
 
 GoOracle has several variables to be set in order to work. These are explained in the comments of the default settings `Preferences > Package Settings > GoOracle > Settings-Default`:
 
