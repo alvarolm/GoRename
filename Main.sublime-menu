@@ -10,21 +10,21 @@
 				"children":
 				[
 					{
-						"caption": "GoGuru",
+						"caption": "GoRename",
 						"children":
 						[
 							{
 								"caption": "Settings – Default",
 								"command": "open_file",
 								"args": {
-									"file": "${packages}/GoGuru/Default.sublime-settings"
+									"file": "${packages}/GoRename/Default.sublime-settings"
 								}
 							},
 							{
 								"caption": "Settings – User",
 								"command": "open_file",
 								"args": {
-									"file": "${packages}/GoGuru/User.sublime-settings"
+									"file": "${packages}/GoRename/User.sublime-settings"
 								}
 							},
 							{ "caption": "-" },
@@ -33,7 +33,7 @@
 								"platform": "Linux",
 								"command": "open_file",
 								"args": {
-									"file": "${packages}/GoGuru/Default (Linux).sublime-keymap"
+									"file": "${packages}/GoRename/Default (Linux).sublime-keymap"
 								}
 							},
 							{
@@ -41,7 +41,7 @@
 								"platform": "Windows",
 								"command": "open_file",
 								"args": {
-									"file": "${packages}/GoGuru/Default (Windows).sublime-keymap"
+									"file": "${packages}/GoRename/Default (Windows).sublime-keymap"
 								}
 							},
 							{
@@ -49,7 +49,7 @@
 								"platform": "OSX",
 								"command": "open_file",
 								"args": {
-									"file": "${packages}/GoGuru/Default (OSX).sublime-keymap"
+									"file": "${packages}/GoRename/Default (OSX).sublime-keymap"
 								}
 							},
 							{ "caption": "-" },
@@ -57,7 +57,7 @@
 								"caption": "Changes & Announcements",
 								"command": "open_file",
 								"args": {
-									"file": "${packages}/GoGuru/CHANGELOG.md"
+									"file": "${packages}/GoRename/CHANGELOG.md"
 								}
 							},
 							{ "caption": "-" },
@@ -65,21 +65,21 @@
 								"caption": "Read Me",
 								"command": "open_file",
 								"args": {
-									"file": "${packages}/GoGuru/README.md"
+									"file": "${packages}/GoRename/README.md"
 								}
 							},
 							{
 								"caption": "Authors & Contributors",
 								"command": "open_file",
 								"args": {
-									"file": "${packages}/GoGuru/AUTHORS.md"
+									"file": "${packages}/GoRename/AUTHORS.md"
 								}
 							},
 							{
 								"caption": "License (MIT)",
 								"command": "open_file",
 								"args": {
-									"file": "${packages}/GoGuru/LICENSE.md"
+									"file": "${packages}/GoRename/LICENSE.md"
 								}
 							}
 						]
