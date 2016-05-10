@@ -35,7 +35,7 @@ def plugin_loaded():
     global use_golangconfig
 
     DEBUG = get_setting("gorename_debug", False)
-    use_golangconfig = get_setting("use_golangconfig", False)
+    use_golangconfig = get_setting("gorename_use_golangconfig", False)
 
     # load shellenv
     def load_shellenv():

@@ -7,7 +7,7 @@
 	"rename_modified_files": false,
 
 	// use golangconfig, if false then shellenv will be used to get golang environment variables
-	"use_golangconfig": false,
+	"gorename_use_golangconfig": false,
 
 	// The output can either be one of: 'buffer', 'output_panel'
 	// Buffers can hold results from more than one invocation
