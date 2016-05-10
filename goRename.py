@@ -64,7 +64,6 @@ def plugin_loaded():
         PluginPath = os.path.dirname(os.path.realpath(__file__))
         p = subprocess.Popen(["git", "describe", "master", "--tags"], stdout=subprocess.PIPE, cwd=PluginPath)
         GITVERSION = p.communicate()[0].decode("utf-8").rstrip()
-        log('replacing', get_setting('gorename_version'), 'for', GITVERSION+'_')
         if p.returncode != 0:
              debug("git return code", p.returncode)
              raise Exception("git return code", p.returncode) 
