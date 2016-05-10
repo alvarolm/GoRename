@@ -54,7 +54,7 @@ GoOracle has several variables to be set in order to work. These are explained i
 	"rename_modified_files": false,
 
 	// use golangconfig, if false then shellenv will be used to get golang environment variables
-	"use_golangconfig": false,
+	"gorename_use_golangconfig": false,
 
 	// The output can either be one of: 'buffer', 'output_panel'
 	// Buffers can hold results from more than one invocation
@@ -62,17 +62,12 @@ GoOracle has several variables to be set in order to work. These are explained i
 	"output": "output_panel",
 
 	// print debug info to the terminal
-	"debug": false,
+	"gorename_debug": false,
 
 	// env overwrites the default shell environment vars
 	// e.g "env": { "GOPATH": "$HOME/go/bin:$PATH" }
 	// not used when use_golangconfig is set to true
 	"env": {},
-
-	// guru_scope is an array of scopes of analysis for guru.
-	// e.g (for github.com/juju/juju) "guru_scope": ["github.com/juju/juju/cmd/juju", "github.com/juju/juju/cmd/jujud"]
-	// not used when use_golangconfig is set to true
-	"gorename_scope": [],
 }
 ```
 You set your own variables in `Preferences > Package Settings > GoRename > Settings-User`.
