@@ -14,7 +14,6 @@ import sublime, sublime_plugin, subprocess, time, re, os, subprocess, sys, time,
 
 DEBUG = False
 VERSION = ''
-PluginPath = ''
 use_golangconfig = False
 # holds renaming parameters
 renameMe = {}
@@ -33,18 +32,15 @@ def error(*msg):
 def plugin_loaded():
     global DEBUG
     global VERSION
-    global PluginPath
     global use_golangconfig
 
-    DEBUG = get_setting("debug", False)
-    PluginPath = sublime.packages_path()+'/GoRename/'
+    DEBUG = get_setting("gorename_debug", False)
     use_golangconfig = get_setting("use_golangconfig", False)
 
     # load shellenv
     def load_shellenv():
-        sys.path.append(PluginPath+"/dep/")
         global shellenv
-        import shellenv
+        from .dep import shellenv
 
     # try golangconfig
     if use_golangconfig:
@@ -60,27 +56,33 @@ def plugin_loaded():
     else:
         load_shellenv()
 
-
-
     log("debug:", DEBUG)
     log("use_golangconfig", use_golangconfig)
 
-    # keep track of the version if possible
+    # keep track of the version if possible (pretty nasty workaround, any other ideas ?)
     try:
+        PluginPath = os.path.dirname(os.path.realpath(__file__))
         p = subprocess.Popen(["git", "describe", "master", "--tags"], stdout=subprocess.PIPE, cwd=PluginPath)
         GITVERSION = p.communicate()[0].decode("utf-8").rstrip()
+        log('replacing', get_setting('gorename_version'), 'for', GITVERSION+'_')
         if p.returncode != 0:
              debug("git return code", p.returncode)
-        f = open(PluginPath+'VERSION', 'w')
-        f.write(GITVERSION)
+             raise Exception("git return code", p.returncode) 
+
+
+        defsettings = os.path.join(PluginPath, 'Default.sublime-settings')
+        f = open(defsettings,'r')
+        filedata = f.read()
+        f.close()
+        newdata = filedata.replace(get_setting('gorename_version'), GITVERSION+'_')
+        f = open(defsettings,'w')
+        f.write(newdata)
         f.close()
     except:
         debug("couldn't get git tag:", sys.exc_info()[0])
 
     # read version
-    f = open(PluginPath+'VERSION', 'r')
-    VERSION = f.read().rstrip()
-    f.close()
+    VERSION = sublime.load_settings('Default.sublime-settings').get('gorename_version')
     log("version:", VERSION)
 
 
@@ -118,7 +120,7 @@ class GoRenameCommand(sublime_plugin.TextCommand):
             self.view.show_popup('<b>Gorename</b>:<br/> Invalid identifier:\nno identifier here.')
             return
 
-        message = 'Running GoRename [press ENTER to continue]:\nFrom %s to %s\n[Line Number: %s][Byte Offset: %s]\nFlags: %s\nReference:\n%s'
+        message = 'Running GoRename %s:\nFrom %s to %s\n[Line Number: %s][Byte Offset: %s]\nFlags: %s\nReference:\n%s'
 
         global s, f, v, flags
         s = simulate
@@ -158,8 +160,9 @@ class GoRenameCommand(sublime_plugin.TextCommand):
         def rename_name_input(name):
             debug('flags:', flags)
 
-            self.write_running(message % (word, name, line_number, byte_begin, compile_flags(True), line_string), True, True) 
             global renameMe
+            renameMe['compiled_message'] = message % ('%s',word, name, line_number, byte_begin, compile_flags(True), line_string)
+            self.write_running(renameMe['compiled_message'] % ('[press ENTER to continue]'), True, True) 
             renameMe['offset'] = byte_begin
             renameMe['name'] = name
             renameMe['flags'] = flags
@@ -193,7 +196,8 @@ class GoRenameCommand(sublime_plugin.TextCommand):
         """ Write the "Running..." header to a new file and focus it to get results
         """
 
-        window = self.view.window()
+        #window = self.view.window()
+        window = sublime.active_window()
         view = get_output_view(window)
         view.set_read_only(False)
 
@@ -267,9 +271,6 @@ class GoRenameCommand(sublime_plugin.TextCommand):
 
         debug("env", cmd_env)
 
-        gorename_scope = ",".join(get_setting("gorename_scope", ""))
-
-
         gorename_json = ""
         if get_setting("gorename_json", False):
             gorename_json = "-json"
@@ -312,6 +313,7 @@ class GoRenameConfirmCommand(sublime_plugin.TextCommand):
                 renameMe = {}
             else:
                 GR = GoRenameCommand(self)
+                GR.write_running(renameMe['compiled_message'] % ('[Running...]'), True, True)
                 GR.gorename(file_path=renameMe['file_path'] ,begin_offset=renameMe['offset'], name=renameMe['name'], flags=renameMe['flags'], callback=GR.gorename_complete)
                 # reset renameMe
                 renameMe = {}
