@@ -24,7 +24,7 @@
 								"caption": "Settings – User",
 								"command": "open_file",
 								"args": {
-									"file": "${packages}/GoRename/User.sublime-settings"
+									"file": "${packages}/User/GoRename.sublime-settings"
 								}
 							},
 							{ "caption": "-" },

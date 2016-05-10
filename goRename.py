@@ -84,6 +84,11 @@ def plugin_loaded():
     VERSION = sublime.load_settings('Default.sublime-settings').get('gorename_version')
     log("version:", VERSION)
 
+    # check if user setting exists and creates it
+    us = sublime.load_settings("GoRename.sublime-settings")
+    if (not us.has('gorename_debug')):
+        us.set('gorename_debug', DEBUG)
+        sublime.save_settings("GoRename.sublime-settings")
 
 class GoRenameCommand(sublime_plugin.TextCommand):
     def __init__(self, view):
@@ -441,7 +446,7 @@ def get_setting(key, default=None):
         pass
 
     if not val:
-        val = sublime.load_settings("User.sublime-settings").get(key)
+        val = sublime.load_settings("GoRename.sublime-settings").get(key)
     if not val:
         val = sublime.load_settings("Default.sublime-settings").get(key)
     if not val:
