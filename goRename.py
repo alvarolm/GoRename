@@ -103,13 +103,14 @@ class GoRenameCommand(sublime_plugin.TextCommand):
             cb_map = self.get_map(text)
             byte_end = cb_map[sorted(cb_map.keys())[-1]]
             byte_begin = None
-        except:
-            debug("couldn't obtain selection refernce:", sys.exc_info()[0])
 
-        if not region.empty(): 
-            byte_begin = cb_map[region.begin()-1]
-        else:
-            byte_begin = byte_end
+            if not region.empty(): 
+                byte_begin = cb_map[region.begin()-1]
+            else:
+                byte_begin = byte_end
+        except:
+            sublime.error_message('GoRename:\nCouldn\'t get cursor positon, make sure that the Go source file is saved and the cursor is over the identifier (variable, function ...) you want to query.')
+            error("couldn't cursor position: ", sys.exc_info()[0])
         
         word = self.view.substr(self.view.word(region.begin())).rstrip()
         position = self.view.rowcol(region.begin())
