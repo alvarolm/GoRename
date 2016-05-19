@@ -28,8 +28,10 @@
         </ul>
       </header>
       <section>
-        <h1>
-<a id="gorename-" class="anchor" href="#gorename-" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>GoRename </h1>
+        <p><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&amp;business=alvarofleivam%40gmail%2ecom&amp;lc=AL&amp;item_name=Donation%20%5b%20for%20a%20bus%20ticket%2c%20coffe%20anything%20you%20can%20I%27m%20happy%20thanks%20%21%20%3a%29%20%5d&amp;item_number=donation&amp;button_subtype=services&amp;currency_code=USD&amp;bn=PP%2dBuyNowBF%3abtn_buynowCC_LG%2egif%3aNonHosted"><img src="https://img.shields.io/badge/donate-a%20bus%20ticket%2C%20cup%20of%20coffe%2C%20anything%20you%20can%2C%20thanks!-orange.svg" alt="donate"></a></p>
+
+<h1>
+<a id="gorename" class="anchor" href="#gorename" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>GoRename</h1>
 
 <p>GoRename is a Golang plugin for <a href="http://www.sublimetext.com/">SublimeText</a> 3 that integrates the Go <a href="https://godoc.org/golang.org/x/tools/cmd/gorename">gorename</a> tool.</p>
 
@@ -83,7 +85,7 @@
     <span class="pl-s"><span class="pl-pds">"</span>rename_modified_files<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">false</span>,
 
     <span class="pl-c">// use golangconfig, if false then shellenv will be used to get golang environment variables</span>
-    <span class="pl-s"><span class="pl-pds">"</span>use_golangconfig<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">false</span>,
+    <span class="pl-s"><span class="pl-pds">"</span>gorename_use_golangconfig<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">false</span>,
 
     <span class="pl-c">// The output can either be one of: 'buffer', 'output_panel'</span>
     <span class="pl-c">// Buffers can hold results from more than one invocation</span>
@@ -91,17 +93,12 @@
     <span class="pl-s"><span class="pl-pds">"</span>output<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>output_panel<span class="pl-pds">"</span></span>,
 
     <span class="pl-c">// print debug info to the terminal</span>
-    <span class="pl-s"><span class="pl-pds">"</span>debug<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">false</span>,
+    <span class="pl-s"><span class="pl-pds">"</span>gorename_debug<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">false</span>,
 
     <span class="pl-c">// env overwrites the default shell environment vars</span>
     <span class="pl-c">// e.g "env": { "GOPATH": "$HOME/go/bin:$PATH" }</span>
     <span class="pl-c">// not used when use_golangconfig is set to true</span>
     <span class="pl-s"><span class="pl-pds">"</span>env<span class="pl-pds">"</span></span><span class="pl-k">:</span> {},
-
-    <span class="pl-c">// guru_scope is an array of scopes of analysis for guru.</span>
-    <span class="pl-c">// e.g (for github.com/juju/juju) "guru_scope": ["github.com/juju/juju/cmd/juju", "github.com/juju/juju/cmd/jujud"]</span>
-    <span class="pl-c">// not used when use_golangconfig is set to true</span>
-    <span class="pl-s"><span class="pl-pds">"</span>gorename_scope<span class="pl-pds">"</span></span><span class="pl-k">:</span> [],
 }</pre></div>
 
 <p>You set your own variables in <code>Preferences &gt; Package Settings &gt; GoRename &gt; Settings-User</code>.</p>
