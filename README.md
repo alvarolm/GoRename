@@ -50,25 +50,25 @@ GoOracle has several variables to be set in order to work. These are explained i
 
 ```javascript
 {
-	// rename files that had been modified after the 'go_rename' command has been executed.
-	// (DO NOT set to true unless you want a renaming nightmare)
-	"rename_modified_files": false,
+  // rename files that had been modified after the 'go_rename' command has been executed.
+  // (DO NOT set to true unless you want a renaming nightmare)
+  "gorename_rename_modified_files": false,
 
-	// use golangconfig, if false then shellenv will be used to get golang environment variables
-	"gorename_use_golangconfig": false,
+  // use golangconfig, if false then shellenv will be used to get golang environment variables
+  "gorename_use_golangconfig": false,
 
-	// The output can either be one of: 'buffer', 'output_panel'
-	// Buffers can hold results from more than one invocation
-	// Output panels sit underneath the editor area and are easily dismissed
-	"output": "output_panel",
+  // The output can either be one of: 'buffer', 'output_panel'
+  // Buffers can hold results from more than one invocation
+  // Output panels sit underneath the editor area and are easily dismissed
+  "gorename_output": "output_panel",
 
-	// print debug info to the terminal
-	"gorename_debug": false,
+  // print debug info to the terminal
+  "gorename_debug": false,
 
-	// env overwrites the default shell environment vars
-	// e.g "env": { "GOPATH": "$HOME/go/bin:$PATH" }
-	// not used when use_golangconfig is set to true
-	"env": {},
+  // env overwrites the default shell environment vars
+  // e.g "env": { "GOPATH": "$HOME/go/bin:$PATH" }
+  // not used when gorename_use_golangconfig is set to true
+  "gorename_env": {},
 }
 ```
 You set your own variables in `Preferences > Package Settings > GoRename > Settings-User`.

@@ -209,7 +209,7 @@ class GoRenameCommand(sublime_plugin.TextCommand):
         # Run a new command to use the edit object for this view.
         view.run_command('go_rename_write_running', {'content': content})
 
-        if get_setting("output", "buffer") == "output_panel":
+        if get_setting("gorename_output", "buffer") == "output_panel":
             window.run_command('show_panel', {'panel': "output." + view.name() })
         else:
             window.focus_view(view)
@@ -234,7 +234,7 @@ class GoRenameCommand(sublime_plugin.TextCommand):
             'result': result,
             'err': err})
 
-        if get_setting("output", "buffer") == "output_panel":
+        if get_setting("gorename_output", "buffer") == "output_panel":
             window.run_command('show_panel', {'panel': "output." + view.name() })
         else:
             window.focus_view(view)
@@ -274,7 +274,7 @@ class GoRenameCommand(sublime_plugin.TextCommand):
         else:
             toolpath = 'gorename'
             cmd_env = shellenv.get_env(for_subprocess=True)[1]
-            cmd_env.update(get_setting("env", {}))
+            cmd_env.update(get_setting("gorename_env", {}))
 
         debug("env", cmd_env)
 
@@ -314,7 +314,7 @@ class GoRenameConfirmCommand(sublime_plugin.TextCommand):
         if (len(renameMe)==0):
             sublime.error_message("Invalid GoRename parameters")
         if (runningTool == False):
-            if ((hashlib.sha256(open(renameMe['file_path'],'rb').read()).hexdigest() != renameMe['checksum']) and (get_setting('rename_modified_files', False) == False)):
+            if ((hashlib.sha256(open(renameMe['file_path'],'rb').read()).hexdigest() != renameMe['checksum']) and (get_setting('gorename_rename_modified_files', False) == False)):
                 sublime.error_message("Couldn't execute gorename, the referenced file has changed, please start over.")
                 # reset renameMe
                 renameMe = {}
@@ -363,7 +363,7 @@ class GoRenameWriteRunningCommand(sublime_plugin.TextCommand):
 
 class GoRenameShowResultsCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        if get_setting("output", "buffer") == "output_panel":
+        if get_setting("gorename_output", "buffer") == "output_panel":
             self.view.window().run_command('show_panel', {'panel': "output.GoRename Output" })
         else:
             output_view = get_output_view(self.view.window())
@@ -417,7 +417,7 @@ def get_output_view(window):
     view = None
     buff_name = 'GoRename Output'
 
-    if get_setting("output", "buffer") == "output_panel":
+    if get_setting("gorename_output", "buffer") == "output_panel":
         view = window.create_output_panel(buff_name)
     else:
         # If the output file is already open, use that.
