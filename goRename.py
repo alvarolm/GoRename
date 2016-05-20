@@ -249,6 +249,8 @@ class GoRenameCommand(sublime_plugin.TextCommand):
         for char_offset, char in enumerate(chars):
             cb_map[char_offset] = byte_offset
             byte_offset += len(char.encode('utf-8'))
+            if char == '\n' and self.view.line_endings() == "Windows":
+                byte_offset += 1
         return cb_map
 
     def gorename(self, file_path, begin_offset=None, flags=None, name=None, callback=None):
