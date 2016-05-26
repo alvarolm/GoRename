@@ -185,7 +185,7 @@ class GoRenameCommand(sublime_plugin.TextCommand):
             if flag_opt != -1:
                 pop_menu()
             else: 
-                self.view.window().show_input_panel('GoRename: rename "%s" (from line %s) to' % (word, line_number), '', rename_name_input, on_change=None, on_cancel=None)
+                self.view.window().show_input_panel('GoRename: rename "%s" (from line %s) to' % (word, line_number), word, rename_name_input, on_change=None, on_cancel=None)
 
         def pop_menu():
             self.view.show_popup_menu(compile_flags(), popup_menu_callback)
