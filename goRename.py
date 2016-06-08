@@ -293,7 +293,7 @@ class GoRenameCommand(sublime_plugin.TextCommand):
         # Build gorename cmd.
         cmd = "%(toolpath)s -offset %(file_path)s:%(pos)s -to %(name)s %(flags)s" % {
         "toolpath": toolpath,
-        "file_path": cmd_quote(os.path.realpath(file_path)),
+        "file_path": cmd_quote(os.path.realpath(file_path)).replace('\'', '\"'),
         "pos": pos,
         "name": name,
         "flags": flags} 
