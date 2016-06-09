@@ -56,6 +56,9 @@ GoOracle has several variables to be set in order to work. These are explained i
 
   // use golangconfig, if false then shellenv will be used to get golang environment variables
   "gorename_use_golangconfig": false,
+  
+  // fill variable name text field by default
+  "gorename_autofill": false,
 
   // The output can either be one of: 'buffer', 'output_panel'
   // Buffers can hold results from more than one invocation
