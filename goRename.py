@@ -12,11 +12,6 @@ go get -u golang.org/x/tools/cmd/gorename
 
 import sublime, sublime_plugin, subprocess, time, re, os, subprocess, sys, time, hashlib
 
-try:
-    from shlex import quote as cmd_quote
-except ImportError:
-    from pipes import quote as cmd_quote
-
 DEBUG = False
 VERSION = ''
 use_golangconfig = False
@@ -291,9 +286,9 @@ class GoRenameCommand(sublime_plugin.TextCommand):
             gorename_json = "-json"
 
         # Build gorename cmd.
-        cmd = "%(toolpath)s -offset %(file_path)s:%(pos)s -to %(name)s %(flags)s" % {
+        cmd = "%(toolpath)s -offset \"%(file_path)s:%(pos)s\" -to %(name)s %(flags)s" % {
         "toolpath": toolpath,
-        "file_path": cmd_quote(os.path.realpath(file_path)).replace('\'', '\"'),
+        "file_path": os.path.realpath(file_path),
         "pos": pos,
         "name": name,
         "flags": flags} 
