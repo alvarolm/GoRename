@@ -166,7 +166,14 @@ class GoRenameCommand(sublime_plugin.TextCommand):
             debug('flags:', flags)
 
             global renameMe
-            renameMe['compiled_message'] = message % ('%s',word, name, line_number, byte_begin, compile_flags(True), line_string)
+            renameMe['compiled_message'] = message % ('%s',
+            	word.replace('%', '%%'),
+            	name.replace('%', '%%'),
+            	line_number,
+            	byte_begin,
+            	str(compile_flags(True)).replace('%', '%%'),
+            	line_string.replace('%', '%%'),
+            )
             self.write_running(renameMe['compiled_message'] % ('[press ENTER to continue]'), True, True) 
             renameMe['offset'] = byte_begin
             renameMe['name'] = name
